@@ -163,7 +163,7 @@ namespace gmb { namespace test
   while(0)
 
 #define _SHOULD_BE_FALSE \
-  () == true ) \
+  if(_expr_lambda_() == true ) \
     { \
       ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" << \
