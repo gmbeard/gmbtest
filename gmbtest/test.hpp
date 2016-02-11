@@ -30,9 +30,9 @@
 
 namespace gmb { namespace test
 {
-  size_t error_count;
+  static size_t error_count;
   using test_case_t = void(*)(char const*);
-  std::vector<std::pair<test_case_t, char const*>> list;
+  static std::vector<std::pair<test_case_t, char const*>> list;
 } }
 
 #define TEST_STRINGIFY_IMPL(str) #str
