@@ -6,34 +6,46 @@ Usage
 ----
 Testing is done using a small set of macros, namely `DEFINE_TEST_MAIN`, `TEST_CASE(...)`, `THIS_(x)_SHOULD_...`
 
-    #include <gmbtest/test.hpp>
+````c++
+#include <gmbtest/test.hpp>
 
-    DEFINE_TEST_MAIN // This needs to appear once
-                     // in your test application.
+DEFINE_TEST_MAIN // This needs to appear once
+                 // in your test application.
 
-    TEST_CASE(should_create_a_test)
-    {
-      auto a = 0;
-      a++;
+TEST_CASE(should_create_a_test)
+{
+  auto a = 0;
+  a++;
 
-      THIS_(a)_SHOULD_BE_(1);
+  THIS_(a)_SHOULD_BE_(1);
 
-      a++;
-      THIS_(a == 2)_SHOULD_BE_FALSE; // Failure.
+  a++;
+  THIS_(a == 2)_SHOULD_BE_FALSE; // Failure.
 
-      LOG_DEBUG("a is " << a); // Log to STDOUT.
-    }
+  LOG_DEBUG("a is " << a); // Log to STDOUT.
+}
 
-    TEST_CASE(another_test)
-    {
-      ...
-    }
+TEST_CASE(another_test)
+{
+  ...
+}
+````
 
 We can also test for exceptions...
 
-    TEST_EXPECT_THROW(obj.func_that_should_throw()); // Fails if no exception thrown.
+````c++
+THIS_(obj.risky_func())_SHOULD_THROW;
 
-    TEST_EXPECT_NO_THROW(obj.func_that_shouldnt_throw()); // Fails if exception thrown.
+THIS_(obj.safe_func())_SHOULD_NOT_THROW;
+````
+
+If you need to test a block of code (instead of a single statement, like above) then you can use...
+
+````c++
+TEST_EXPECT_THROW( statements ... );
+
+TEST_EXPECT_NO_THROW( statements ... );
+````
 
 Requirements
 ----

@@ -111,10 +111,34 @@ namespace gmb { namespace test
   do { \
     char const* _expr_str_  = \
       TEST_STRINGIFY(expr); \
-    if ([&]() -> bool { return (expr); }
+    auto _expr_lambda_ = \
+      [&]{ return (expr); }; \
 
+#define _SHOULD_NOT_THROW \
+    try { _expr_lambda_(); } \
+    catch(...) { \
+      ::gmb::test::error_count()++; \
+      std::cerr << "ASSERTION FAILED: DIDN'T EXPECT \"" << \
+        _expr_str_ << "\" TO THROW!" \
+        << TEST_PRINT_POSITION \
+        << std::endl; \
+    } \
+  } \
+  while(0)
+
+#define _SHOULD_THROW \
+    try { _expr_lambda_(); \
+      ::gmb::test::error_count()++; \
+      std::cerr << "ASSERTION FAILED: EXPECTED \"" << \
+        _expr_str_ << "\" TO THROW!" \
+        << TEST_PRINT_POSITION \
+        << std::endl; \
+    } \
+    catch(...) { } \
+  } \
+  while(0)
 #define _SHOULD_BE_(expected) \
-  () != (expected) ) \
+  if(_expr_lambda_() != (expected) ) \
     { \
       ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" << \
@@ -127,7 +151,7 @@ namespace gmb { namespace test
   while(0)
 
 #define _SHOULD_BE_TRUE \
-  () == false ) \
+  if(_expr_lambda_() == false ) \
     { \
       ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" << \
