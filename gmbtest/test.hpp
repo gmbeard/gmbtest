@@ -30,9 +30,19 @@
 
 namespace gmb { namespace test
 {
-  static size_t error_count;
+  inline size_t& error_count()
+  {
+    static size_t error_count_{0};
+    return error_count_;
+  }
+
   using test_case_t = void(*)(char const*);
-  static std::vector<std::pair<test_case_t, char const*>> list;
+  inline std::vector<std::pair<test_case_t, char const*>>& list()
+  {
+    static std::vector<std::pair<test_case_t, char const*>> list_;
+    return list_;
+  }
+
 } }
 
 #define TEST_STRINGIFY_IMPL(str) #str
@@ -46,7 +56,7 @@ namespace gmb { namespace test
   { \
     name##_helper_t() \
     { \
-      ::gmb::test::list.push_back(std::make_pair( \
+      ::gmb::test::list().push_back(std::make_pair( \
         name, TEST_STRINGIFY(name))); \
     } \
   } name##_instance; \
@@ -55,7 +65,7 @@ namespace gmb { namespace test
 #define DEFINE_TEST_MAIN \
   int main() \
   { \
-    for(auto&& t : ::gmb::test::list) { \
+    for(auto&& t : ::gmb::test::list()) { \
       std::get<0>(t)(std::get<1>(t)); \
     } \
     TEST_EXIT(); \
@@ -76,7 +86,7 @@ namespace gmb { namespace test
 #define TEST_ASSERT(x) \
   do { \
     if( !(x) ) { \
-      ::gmb::test::error_count++; \
+      ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" TEST_STRINGIFY(x) \
         << "\"" << TEST_PRINT_POSITION \
         << std::endl; \
@@ -88,7 +98,7 @@ namespace gmb { namespace test
   do { \
     try { \
       x; \
-      ::gmb::test::error_count++; \
+      ::gmb::test::error_count()++; \
       std::cerr << "EXPECT EXCEPTION FAILED: \"" TEST_STRINGIFY(x) \
         << "\"" << TEST_PRINT_POSITION \
         << std::endl; \
@@ -106,7 +116,7 @@ namespace gmb { namespace test
 #define _SHOULD_BE_(expected) \
   () != (expected) ) \
     { \
-      ::gmb::test::error_count++; \
+      ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" << \
         _expr_str_ << " != " << TEST_STRINGIFY(expected) \
         << "\"" \
@@ -119,7 +129,7 @@ namespace gmb { namespace test
 #define _SHOULD_BE_TRUE \
   () == false ) \
     { \
-      ::gmb::test::error_count++; \
+      ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" << \
         _expr_str_ << "\"" \
         << TEST_PRINT_POSITION \
@@ -131,7 +141,7 @@ namespace gmb { namespace test
 #define _SHOULD_BE_FALSE \
   () == true ) \
     { \
-      ::gmb::test::error_count++; \
+      ::gmb::test::error_count()++; \
       std::cerr << "ASSERTION FAILED: \"" << \
         _expr_str_ << "\"" \
         << TEST_PRINT_POSITION \
@@ -146,7 +156,7 @@ namespace gmb { namespace test
       x; \
     } \
     catch(...) { \
-      ::gmb::test::error_count++; \
+      ::gmb::test::error_count()++; \
       std::cerr << "EXPECT NO EXCEPTION FAILED: " TEST_STRINGIFY(x) \
         << TEST_PRINT_POSITION \
         << std::endl; \
@@ -156,8 +166,8 @@ namespace gmb { namespace test
 
 #define TEST_EXIT() \
   do { \
-    if(::gmb::test::error_count > 0) { \
-      std::cerr << ::gmb::test::error_count << " TESTS FAILED!" \
+    if(::gmb::test::error_count() > 0) { \
+      std::cerr << ::gmb::test::error_count() << " TESTS FAILED!" \
         << std::endl; \
       return 1; \
     } \
